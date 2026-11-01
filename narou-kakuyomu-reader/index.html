@@ -14,7 +14,7 @@
     <link rel="icon" type="image/svg+xml" href="./icons/icon.svg">
     <link rel="apple-touch-icon" href="./icons/icon-192.png">
     
-    <link rel="stylesheet" href="./css/style.css?v=9">
+    <link rel="stylesheet" href="./css/style.css?v=11">
 </head>
 <body>
 
@@ -26,7 +26,7 @@
                 <h1 class="app-title">なろう・カクヨムリーダー</h1>
             </div>
             <div class="header-actions">
-                <span class="header-badge" id="header-badge">v9 GitHub Pages版</span>
+                <span class="header-badge" id="header-badge">v11 GitHub Pages版</span>
                 <button type="button" id="btn-open-proxy-modal" class="btn-header-refresh" title="プロキシ設定">⚙️ 設定</button>
                 <button type="button" id="btn-force-refresh" class="btn-header-refresh" title="最新版へ更新">🔄 更新</button>
             </div>
@@ -184,11 +184,11 @@
         <div class="modal-box" style="max-width: 480px;">
             <h3 class="modal-title">CORSプロキシ設定</h3>
             <p style="font-size: 13px; color: #64748b; margin-bottom: 12px; line-height: 1.5;">
-                GitHub Pages等の静的環境から「なろう」「カクヨム」を取得するプロキシを指定できます。未入力の場合は公開プロキシが自動使用されます。
+                GitHub Pages等の静的環境から「なろう」「カクヨム」を取得するプロキシを指定できます。未入力の場合は内蔵プロキシ（Cloudflare Worker）が自動使用されます。
             </p>
             <div style="margin-bottom: 14px;">
                 <label style="font-size: 12px; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">カスタムプロキシURL (例: Cloudflare Worker)</label>
-                <input type="text" id="input-custom-proxy" class="text-input" placeholder="https://my-proxy.workers.dev/?url=" style="width: 100%;">
+                <input type="text" id="input-custom-proxy" class="text-input" placeholder="https://novel.kzfm-game-aka.workers.dev/proxy?url=" style="width: 100%;">
             </div>
             <div style="display: flex; gap: 8px;">
                 <button type="button" id="btn-save-proxy" class="btn-primary" style="flex: 1;">保存</button>
@@ -201,7 +201,7 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js?v=9').then(reg => {
+                navigator.serviceWorker.register('./sw.js?v=11').then(reg => {
                     reg.update();
                 }).catch(err => console.warn('SW registration failed:', err));
             });
@@ -214,6 +214,6 @@
             });
         }
     </script>
-    <script type="module" src="./js/app.js?v=9"></script>
+    <script type="module" src="./js/app.js?v=11"></script>
 </body>
 </html>
