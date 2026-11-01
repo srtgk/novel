@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#000000">
+    <meta name="description" content="「小説家になろう」カクヨム風オフラインリーダー - 最下部スクロールで次話移動 & オフライン対応">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>カクヨム風なろうリーダー</title>
+    
+    <link rel="manifest" href="./manifest.webmanifest">
+    <link rel="icon" type="image/svg+xml" href="./icons/icon.svg">
+    <link rel="apple-touch-icon" href="./icons/icon-192.png">
+    
+    <link rel="stylesheet" href="./css/style.css?v=9">
+</head>
+<body>
+
+    <!-- 1. ライブラリ画面 -->
+    <div id="library-screen" class="screen">
+        <header class="app-header">
+            <div class="brand">
+                <span class="brand-icon">📚</span>
+                <h1 class="app-title">なろう・カクヨムリーダー</h1>
+            </div>
+            <div class="header-actions">
+                <span class="header-badge" id="header-badge">v9 GitHub Pages版</span>
+                <button type="button" id="btn-open-proxy-modal" class="btn-header-refresh" title="プロキシ設定">⚙️ 設定</button>
+                <button type="button" id="btn-force-refresh" class="btn-header-refresh" title="最新版へ更新">🔄 更新</button>
+            </div>
+        </header>
+
+        <!-- PWAインストール案内バナー (HTTPS / 対応ブラウザ時のみ自動表示) -->
+        <div id="pwa-install-banner" class="pwa-install-banner hidden">
+            <div class="pwa-banner-info">
+                <span class="pwa-banner-icon">📲</span>
+                <div>
+                    <div class="pwa-banner-title">ホーム画面に追加してアプリとして使う</div>
+                    <div class="pwa-banner-desc">全画面読書 & 電波のないオフラインでも起動可能</div>
+                </div>
+            </div>
+            <button id="btn-pwa-install" class="btn-pwa-install">インストール</button>
+        </div>
+
+        <main class="library-content">
+            <!-- 作品追加・検索カード -->
+            <section class="add-novel-card">
+                <div class="add-tabs">
+                    <button type="button" id="tab-btn-search" class="tab-btn active">作品を検索</button>
+                    <button type="button" id="tab-btn-ncode" class="tab-btn">URL・作品コード</button>
+                </div>
+
+                <!-- 1. なろう作品検索フォーム -->
+                <form id="form-search-novel" class="input-row">
+                    <input type="text" id="input-search-word" class="text-input" placeholder="なろう検索 (例: 異世界, 悪役令嬢)" required autocomplete="off">
+                    <button type="submit" id="btn-search-submit" class="btn-primary">検索</button>
+                </form>
+
+                <!-- 2. Nコード直接追加フォーム -->
+                <form id="form-add-novel" class="input-row hidden">
+                    <input type="text" id="input-ncode" class="text-input" placeholder="Nコード (例: n2267be) または カクヨムURL・作品ID" autocomplete="off">
+                    <button type="submit" id="btn-add-submit" class="btn-primary">追加</button>
+                </form>
+
+                <!-- 検索結果リスト表示エリア -->
+                <div id="search-results-list" class="search-results-list hidden"></div>
+            </section>
+
+            <!-- 本棚内 絞り込みフィルター & USB・ファイル移行アクション -->
+            <div class="library-filter-wrap" style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                <input type="text" id="input-library-filter" class="filter-input" placeholder="🔍 保存済み作品を絞り込み..." style="flex: 1; min-width: 170px;">
+                <div class="backup-actions" style="display: flex; gap: 6px;">
+                    <button type="button" id="btn-export-backup" style="background-color: #0284c7; color: white; border: none; padding: 9px 12px; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 12px; white-space: nowrap; display: flex; align-items: center; gap: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);" title="USBや別端末へ移行するためのバックアップファイルを保存">
+                        💾 バックアップ保存
+                    </button>
+                    <button type="button" id="btn-import-backup" style="background-color: #16a34a; color: white; border: none; padding: 9px 12px; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 12px; white-space: nowrap; display: flex; align-items: center; gap: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);" title="USBメモリ等にあるバックアップJSONを読み込んで本棚を復元">
+                        📂 バックアップ復元
+                    </button>
+                    <input type="file" id="file-import-backup" accept=".json" style="display: none;">
+                </div>
+            </div>
+
+            <!-- 保存済み作品リスト -->
+            <div class="section-label">保存済みライブラリ</div>
+            <div id="novel-list" class="novel-list">
+                <!-- 動的に生成されます -->
+            </div>
+        </main>
+    </div>
+
+    <!-- 2. 作品詳細・目次画面 -->
+    <div id="detail-screen" class="screen hidden">
+        <nav class="detail-nav">
+            <button id="btn-detail-back" class="nav-back-btn" title="戻る">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <span class="nav-title">作品情報</span>
+        </nav>
+
+        <main class="detail-content">
+            <section class="detail-hero">
+                <h2 id="detail-title" class="detail-title">作品タイトル</h2>
+                <div id="detail-writer" class="detail-writer">作者名</div>
+                <div id="detail-stats" class="detail-stats"></div>
+                <div id="detail-story" class="detail-story">あらすじ</div>
+
+                <div class="detail-main-actions">
+                    <button id="btn-detail-resume" class="btn-primary">続きから読む</button>
+                    <button id="btn-detail-first" class="btn-secondary">最初から読む (第1話)</button>
+                    <button id="btn-download-all" class="btn-download-all">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        <span>全話を一括ダウンロード (オフライン保存)</span>
+                    </button>
+                    <button id="btn-delete-from-detail" class="btn-delete-from-detail">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        <span>作品と保存データを端末から削除</span>
+                    </button>
+                </div>
+            </section>
+
+            <div class="section-label">エピソード一覧</div>
+            <div id="detail-chapter-list" class="chapter-list-wrap">
+                <!-- 動的に生成されます -->
+            </div>
+        </main>
+    </div>
+
+    <!-- 3. カクヨム風リーダー画面 -->
+    <div id="reader-screen" class="screen hidden">
+        <!-- js/reader.js により動的に構築されます -->
+    </div>
+
+    <!-- バックグラウンド一括ダウンロード常駐バー (読書中も操作・進行確認可能) -->
+    <div id="floating-download-bar" class="floating-download-bar">
+        <div class="floating-download-content">
+            <div class="floating-download-info">
+                <span class="floating-download-icon">📥</span>
+                <span id="floating-dl-title" class="floating-download-title">作品ダウンロード中</span>
+                <span id="floating-dl-count" class="floating-download-count">0 / 0 話 (0%)</span>
+            </div>
+            <div class="floating-download-actions">
+                <button id="btn-floating-cancel" class="btn-floating-action">中止</button>
+            </div>
+        </div>
+        <div class="floating-download-track">
+            <div id="floating-dl-fill" class="floating-download-fill"></div>
+        </div>
+    </div>
+
+    <!-- 一括ダウンロード進捗モーダル (必要時の詳細ビュー) -->
+    <div id="download-progress-modal" class="app-modal hidden">
+        <div class="modal-backdrop"></div>
+        <div class="modal-box">
+            <h3 class="modal-title">作品を一括ダウンロード中</h3>
+            <p id="download-progress-status" class="modal-status-text">ダウンロードを準備しています...</p>
+            <div class="modal-progress-bar">
+                <div id="download-progress-bar" class="progress-fill" style="width: 0%"></div>
+            </div>
+            <div id="download-progress-text" class="modal-progress-text">0 / 0 話 完了</div>
+            <div style="display: flex; gap: 8px;">
+                <button id="btn-bg-download" class="btn-primary" style="flex: 1;">バックグラウンドで続行</button>
+                <button id="btn-cancel-download" class="btn-secondary" style="flex: 1;">中止</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- リーダー内 目次ジャンプモーダル -->
+    <div id="modal-toc" class="app-modal hidden">
+        <div id="modal-toc-backdrop" class="modal-backdrop"></div>
+        <div class="modal-toc-box">
+            <div class="modal-toc-header">
+                <h3 class="modal-title" style="margin: 0;">目次</h3>
+                <button id="btn-close-toc-modal" class="btn-close-modal">✕</button>
+            </div>
+            <div id="modal-toc-list" class="modal-toc-list"></div>
+        </div>
+    </div>
+
+    <!-- プロキシ設定モーダル -->
+    <div id="modal-proxy" class="app-modal hidden">
+        <div id="modal-proxy-backdrop" class="modal-backdrop"></div>
+        <div class="modal-box" style="max-width: 480px;">
+            <h3 class="modal-title">CORSプロキシ設定</h3>
+            <p style="font-size: 13px; color: #64748b; margin-bottom: 12px; line-height: 1.5;">
+                GitHub Pages等の静的環境から「なろう」「カクヨム」を取得するプロキシを指定できます。未入力の場合は公開プロキシが自動使用されます。
+            </p>
+            <div style="margin-bottom: 14px;">
+                <label style="font-size: 12px; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">カスタムプロキシURL (例: Cloudflare Worker)</label>
+                <input type="text" id="input-custom-proxy" class="text-input" placeholder="https://my-proxy.workers.dev/?url=" style="width: 100%;">
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <button type="button" id="btn-save-proxy" class="btn-primary" style="flex: 1;">保存</button>
+                <button type="button" id="btn-close-proxy" class="btn-secondary" style="flex: 1;">閉じる</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Service Worker 登録 & スクリプト読み込み -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js?v=9').then(reg => {
+                    reg.update();
+                }).catch(err => console.warn('SW registration failed:', err));
+            });
+            let refreshing = false;
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (!refreshing) {
+                    refreshing = true;
+                    window.location.reload();
+                }
+            });
+        }
+    </script>
+    <script type="module" src="./js/app.js?v=9"></script>
+</body>
+</html>

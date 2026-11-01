@@ -1,0 +1,1720 @@
+/* ==========================================================================
+   カクヨム風オフラインリーダー スタイルシート
+   Pixel 9a (Android 16) モバイル最適化 & PWA対応
+   ========================================================================== */
+
+:root {
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --primary-color: #2b70e0;
+    --primary-hover: #1b5cc2;
+    --accent-color: #f38224;
+    --radius-md: 12px;
+    --radius-lg: 18px;
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Hiragino Sans", "Noto Sans JP", sans-serif;
+    --font-serif: "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: #000000;
+    color: #1e293b;
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.5;
+    user-select: none;
+}
+
+/* ユーティリティ */
+.hidden { display: none !important; }
+.text-green { color: #16a34a !important; }
+
+/* ==========================================================================
+   スクリーンコンテナ
+   ========================================================================== */
+
+.screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background-color: #f8fafc;
+}
+
+/* ==========================================================================
+   1. ライブラリ画面 (Library Screen)
+   ========================================================================== */
+
+.app-header {
+    background: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
+    padding: calc(var(--safe-top) + 12px) 16px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    z-index: 10;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.brand-icon {
+    font-size: 22px;
+}
+
+.app-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #0f172a;
+    letter-spacing: -0.02em;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.header-badge {
+    font-size: 11px;
+    font-weight: 600;
+    background: #e0f2fe;
+    color: #0369a1;
+    padding: 3px 8px;
+    border-radius: 12px;
+}
+
+.btn-header-refresh {
+    font-size: 11px;
+    font-weight: 600;
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+    padding: 3px 8px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-header-refresh:hover, .btn-header-refresh:active {
+    background: #0284c7;
+    color: #ffffff;
+    border-color: #0284c7;
+}
+
+.library-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    padding-bottom: calc(var(--safe-bottom) + 30px);
+}
+
+/* 作品追加フォーム */
+.add-novel-card {
+    background: #ffffff;
+    border-radius: var(--radius-md);
+    padding: 16px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    border: 1px solid #e2e8f0;
+    margin-bottom: 20px;
+}
+
+.add-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #475569;
+    margin-bottom: 10px;
+}
+
+.input-row {
+    display: flex;
+    gap: 8px;
+}
+
+.text-input {
+    flex: 1;
+    padding: 10px 14px;
+    font-size: 15px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    outline: none;
+    background: #f8fafc;
+    transition: border-color 0.2s;
+}
+
+.text-input:focus {
+    border-color: var(--primary-color);
+    background: #ffffff;
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-primary:active {
+    background: var(--primary-hover);
+}
+
+.btn-primary:disabled {
+    background: #94a3b8;
+    cursor: not-allowed;
+}
+
+.section-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+}
+
+/* 作品カード */
+.novel-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.novel-card {
+    background: #ffffff;
+    border-radius: var(--radius-md);
+    padding: 18px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    transition: transform 0.15s;
+}
+
+.novel-card:active {
+    transform: scale(0.99);
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.card-badge {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+}
+
+.badge-downloaded {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.badge-partial {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.sample-tag {
+    font-size: 11px;
+    font-weight: 700;
+    background: #f1f5f9;
+    color: #475569;
+    padding: 3px 8px;
+    border-radius: 6px;
+}
+
+.badge-source {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+    margin-right: 6px;
+}
+
+.badge-kakuyomu {
+    background: #ccfbf1;
+    color: #0f766e;
+    border: 1px solid #99f6e4;
+}
+
+.badge-narou {
+    background: #e0f2fe;
+    color: #0369a1;
+    border: 1px solid #bae6fd;
+}
+
+.btn-delete-novel {
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    font-size: 18px;
+    padding: 8px 12px;
+    margin: -8px -12px -8px 0;
+    cursor: pointer;
+    touch-action: manipulation;
+}
+
+.btn-delete-novel:active {
+    color: #ef4444;
+}
+
+.card-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.4;
+    margin-bottom: 4px;
+}
+
+.card-author {
+    font-size: 13px;
+    color: #64748b;
+    margin-bottom: 10px;
+}
+
+.card-story {
+    font-size: 13px;
+    color: #475569;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 14px;
+}
+
+.card-progress-wrap {
+    margin-bottom: 14px;
+}
+
+.card-progress-bar {
+    width: 100%;
+    height: 6px;
+    background: #e2e8f0;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 6px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--primary-color);
+    border-radius: 3px;
+    transition: width 0.3s;
+}
+
+.card-progress-text {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.card-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.card-actions .btn-primary {
+    flex: 2;
+    padding: 10px 14px;
+    font-size: 14px;
+}
+
+.btn-secondary {
+    flex: 1;
+    background: #f1f5f9;
+    color: #334155;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-secondary:active {
+    background: #e2e8f0;
+}
+
+/* ==========================================================================
+   2. 作品詳細・目次画面 (Detail Screen)
+   ========================================================================== */
+
+.detail-nav {
+    background: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
+    padding: calc(var(--safe-top) + 8px) 16px 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 10;
+}
+
+.nav-back-btn {
+    background: transparent;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    color: #334155;
+    display: flex;
+    align-items: center;
+}
+
+.nav-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #0f172a;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.detail-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    padding-bottom: calc(var(--safe-bottom) + 30px);
+}
+
+.detail-hero {
+    background: #ffffff;
+    border-radius: var(--radius-md);
+    padding: 18px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 20px;
+}
+
+.detail-title {
+    font-size: 19px;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.4;
+    margin-bottom: 6px;
+}
+
+.detail-writer {
+    font-size: 13px;
+    color: #64748b;
+    margin-bottom: 12px;
+}
+
+.detail-stats {
+    font-size: 12px;
+    color: #64748b;
+    font-weight: 600;
+    margin-bottom: 14px;
+    display: flex;
+    gap: 8px;
+}
+
+.detail-story {
+    font-size: 14px;
+    color: #334155;
+    line-height: 1.6;
+    margin-bottom: 18px;
+    white-space: pre-wrap;
+}
+
+.detail-main-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.detail-main-actions .btn-primary {
+    padding: 12px;
+    font-size: 15px;
+    text-align: center;
+}
+
+.detail-main-actions .btn-secondary {
+    padding: 11px;
+    text-align: center;
+}
+
+.btn-download-all {
+    background: #ecfdf5;
+    color: #047857;
+    border: 1px solid #a7f3d0;
+    border-radius: 8px;
+    padding: 11px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.btn-download-all:active {
+    background: #d1fae5;
+}
+
+.chapter-list-wrap {
+    background: #ffffff;
+    border-radius: var(--radius-md);
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+}
+
+.chapter-item {
+    padding: 14px 16px;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: background-color 0.1s;
+}
+
+.chapter-item:last-child {
+    border-bottom: none;
+}
+
+.chapter-item:active {
+    background-color: #f8fafc;
+}
+
+.chapter-item.current-reading {
+    background-color: #eff6ff;
+}
+
+.chapter-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    overflow: hidden;
+}
+
+.chapter-num {
+    font-size: 12px;
+    font-weight: 700;
+    color: #94a3b8;
+    min-width: 28px;
+}
+
+.chapter-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: #1e293b;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.badge-saved {
+    font-size: 10px;
+    font-weight: 700;
+    background: #dcfce7;
+    color: #15803d;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.badge-not-saved {
+    font-size: 10px;
+    color: #94a3b8;
+}
+
+/* ==========================================================================
+   3. カクヨム風リーダー画面 (Reader Screen)
+   ========================================================================== */
+
+.reader-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+/* テーマ別スタイル */
+.theme-light {
+    background-color: #ffffff;
+    color: #1a1a1a;
+    --hud-bg: rgba(255, 255, 255, 0.94);
+    --hud-border: rgba(0, 0, 0, 0.08);
+    --hud-text: #1a1a1a;
+    --pull-color: #64748b;
+    --accent: #2b70e0;
+}
+
+.theme-sepia {
+    background-color: #fbf0d9;
+    color: #3b2e21;
+    --hud-bg: rgba(246, 234, 210, 0.94);
+    --hud-border: rgba(80, 60, 40, 0.1);
+    --hud-text: #3b2e21;
+    --pull-color: #786551;
+    --accent: #d97706;
+}
+
+.theme-dark {
+    background-color: #16171a;
+    color: #ffffff; /* くっきり鮮明な純白 */
+    --hud-bg: rgba(22, 23, 26, 0.96);
+    --hud-border: rgba(255, 255, 255, 0.16);
+    --hud-text: #ffffff;
+    --pull-color: #e2e8f0;
+    --accent: #3b82f6;
+}
+
+.theme-dark .novel-body {
+    color: #ffffff;
+    text-shadow: 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+.theme-dark .novel-preface, .theme-dark .novel-afterword {
+    background: rgba(255, 255, 255, 0.07);
+    color: #f1f5f9;
+    border-left: 3px solid #3b82f6;
+}
+
+.theme-black {
+    background-color: #000000;
+    color: #ffffff; /* OLED漆黒に映える鮮明な白 */
+    --hud-bg: rgba(10, 10, 10, 0.97);
+    --hud-border: rgba(255, 255, 255, 0.18);
+    --hud-text: #ffffff;
+    --pull-color: #cbd5e1;
+    --accent: #60a5fa;
+}
+
+.theme-black .novel-body {
+    color: #ffffff;
+    text-shadow: 0 0 1px rgba(255, 255, 255, 0.15);
+}
+
+.theme-black .novel-preface, .theme-black .novel-afterword {
+    background: rgba(255, 255, 255, 0.08);
+    color: #f8fafc;
+    border-left: 3px solid #60a5fa;
+}
+
+/* フォントファミリ設定 */
+.font-mincho {
+    font-family: var(--font-serif);
+}
+
+.font-gothic {
+    font-family: var(--font-sans);
+}
+
+.font-round {
+    font-family: "Hiragino Maru Gothic ProN", "Kosugi Maru", sans-serif;
+}
+
+/* リーダースクロール領域 */
+.reader-scroller {
+    flex: 1;
+    width: 100%;
+    height: 100%;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    position: relative;
+    padding-top: calc(var(--safe-top) + 24px);
+    padding-bottom: calc(var(--safe-bottom) + 80px);
+}
+
+/* 本文ラッパー */
+.reader-content-wrap {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 0 24px;
+    will-change: transform;
+    user-select: text;
+}
+
+/* 本文要素 */
+.novel-chapter-title {
+    font-size: calc(var(--novel-font-size, 18px) * 1.35);
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 36px;
+    padding-bottom: 16px;
+    border-bottom: 1px dashed currentColor;
+    opacity: 0.9;
+}
+
+.novel-preface, .novel-afterword {
+    font-size: calc(var(--novel-font-size, 18px) * 0.92);
+    line-height: var(--novel-line-height, 1.85);
+    padding: 16px;
+    border-radius: 8px;
+    background: rgba(128, 128, 128, 0.08);
+    margin: 28px 0;
+}
+
+.novel-body {
+    font-size: var(--novel-font-size, 18px);
+    line-height: var(--novel-line-height, 1.85);
+    letter-spacing: 0.03em;
+}
+
+.novel-body p {
+    margin-bottom: 0.8em;
+    min-height: 1.2em;
+}
+
+/* ルビの最適化 */
+ruby {
+    ruby-align: center;
+}
+
+rt {
+    font-size: 0.55em;
+    user-select: none;
+}
+
+/* 縦書きモード */
+.reader-container.writing-vertical .reader-scroller {
+    overflow-x: scroll;
+    overflow-y: hidden;
+    direction: rtl;
+    padding: 30px 40px;
+}
+
+.reader-container.writing-vertical .reader-content-wrap {
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+    max-width: none;
+    height: calc(100vh - var(--safe-top) - var(--safe-bottom) - 80px);
+}
+
+.reader-container.writing-vertical .novel-chapter-title {
+    margin-bottom: 0;
+    margin-left: 36px;
+    border-bottom: none;
+    border-left: 1px dashed currentColor;
+    padding-bottom: 0;
+    padding-left: 16px;
+}
+
+/* ==========================================================================
+   カクヨム風 次話引っ張りインジケーター (Pull to next chapter)
+   ========================================================================== */
+
+.pull-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    pointer-events: none;
+    color: var(--pull-color);
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.pull-indicator.visible {
+    opacity: 1;
+}
+
+.pull-top {
+    height: 50px;
+    margin-top: -50px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.pull-bottom {
+    padding: 30px 0 50px;
+    margin-top: 20px;
+}
+
+.pull-indicator-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.pull-indicator-circle {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.progress-ring {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: rotate(-90deg);
+}
+
+.progress-ring-bg {
+    opacity: 0.15;
+}
+
+.progress-ring-bar {
+    stroke: var(--accent);
+    stroke-dasharray: 100.5;
+    stroke-dashoffset: 100.5;
+    transition: stroke-dashoffset 0.05s linear;
+}
+
+.pull-arrow-icon {
+    transform: rotate(0deg);
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    color: var(--pull-color);
+}
+
+.pull-bottom.ready .pull-arrow-icon {
+    transform: rotate(180deg);
+    color: var(--accent);
+}
+
+.pull-bottom.ready .progress-ring-bar {
+    stroke-width: 4;
+}
+
+.pull-text-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+}
+
+.pull-text {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.pull-bottom.ready .pull-text {
+    color: var(--accent);
+}
+
+.pull-next-sub {
+    font-size: 11px;
+    opacity: 0.7;
+}
+
+.pull-bottom.is-last .pull-indicator-circle {
+    display: none;
+}
+
+/* ページめくりアニメーション */
+.transition-slide-out-up {
+    animation: slideOutUp 0.25s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.transition-slide-in-up {
+    animation: slideInUp 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.transition-slide-out-down {
+    animation: slideOutDown 0.25s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.transition-slide-in-down {
+    animation: slideInDown 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+@keyframes slideOutUp {
+    from { transform: translateY(0); opacity: 1; }
+    to { transform: translateY(-40px); opacity: 0; }
+}
+
+@keyframes slideInUp {
+    from { transform: translateY(40px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slideOutDown {
+    from { transform: translateY(0); opacity: 1; }
+    to { transform: translateY(40px); opacity: 0; }
+}
+
+@keyframes slideInDown {
+    from { transform: translateY(-40px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* 最新話到達エンドカード */
+.reader-end-card {
+    margin: 50px auto 20px;
+    text-align: center;
+    padding: 30px 20px;
+    border-radius: var(--radius-md);
+    background: rgba(128, 128, 128, 0.08);
+}
+
+.end-card-icon {
+    font-size: 36px;
+    margin-bottom: 10px;
+}
+
+.reader-end-card h3 {
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.reader-end-card p {
+    font-size: 13px;
+    opacity: 0.75;
+    margin-bottom: 20px;
+}
+
+/* ==========================================================================
+   HUD (ヘッダー & フッター)
+   ========================================================================== */
+
+.reader-hud {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    background: var(--hud-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    color: var(--hud-text);
+    z-index: 50;
+    transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.28s;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.reader-header {
+    top: 0;
+    transform: translateY(-100%);
+    padding: calc(var(--safe-top) + 6px) 16px 10px;
+    border-bottom: 1px solid var(--hud-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.reader-footer {
+    bottom: 0;
+    transform: translateY(100%);
+    padding: 12px 16px calc(var(--safe-bottom) + 12px);
+    border-top: 1px solid var(--hud-border);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.reader-hud.show {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.hud-btn {
+    background: transparent;
+    border: none;
+    color: inherit;
+    padding: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    border-radius: 8px;
+}
+
+.hud-btn:active {
+    background: rgba(128, 128, 128, 0.15);
+}
+
+.hud-title-wrap {
+    flex: 1;
+    text-align: center;
+    padding: 0 12px;
+    overflow: hidden;
+}
+
+.hud-novel-title {
+    font-size: 14px;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.hud-chapter-subtitle {
+    font-size: 11px;
+    opacity: 0.7;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+}
+
+/* フッター内ナビゲーション - カクヨム準拠 */
+.footer-seeker-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+}
+
+.seeker-slider-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.chapter-seeker-range {
+    width: 100%;
+    height: 6px;
+    background: rgba(128, 128, 128, 0.3);
+    border-radius: 3px;
+    outline: none;
+    accent-color: var(--accent);
+    cursor: pointer;
+}
+
+.ep-counter-wrap {
+    font-size: 12px;
+    font-weight: 700;
+    opacity: 0.9;
+    letter-spacing: 0.03em;
+}
+
+.ep-nav-btn {
+    background: rgba(128, 128, 128, 0.12);
+    border: none;
+    color: inherit;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.ep-nav-btn:active {
+    background: rgba(128, 128, 128, 0.25);
+}
+
+.ep-nav-btn:disabled {
+    opacity: 0.25;
+    pointer-events: none;
+}
+
+/* 下段: アクションボタントレイ */
+.footer-actions-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    gap: 8px;
+    padding-top: 4px;
+    border-top: 1px solid rgba(128, 128, 128, 0.12);
+}
+
+.footer-action-pill {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: inherit;
+    padding: 8px 4px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    transition: background-color 0.15s;
+}
+
+.footer-action-pill:active {
+    background: rgba(128, 128, 128, 0.18);
+}
+
+/* ==========================================================================
+   設定ボトムシート (Settings Sheet)
+   ========================================================================== */
+
+.settings-sheet {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.sheet-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    transition: opacity 0.25s;
+}
+
+.sheet-content {
+    position: relative;
+    background: #ffffff;
+    color: #1e293b;
+    border-radius: 20px 20px 0 0;
+    padding: 16px 20px calc(var(--safe-bottom) + 24px);
+    transform: translateY(100%);
+    transition: transform 0.25s cubic-bezier(0.32, 0.72, 0, 1);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.settings-sheet.open .sheet-backdrop {
+    opacity: 1;
+}
+
+.settings-sheet.open .sheet-content {
+    transform: translateY(0);
+}
+
+.sheet-handle {
+    width: 40px;
+    height: 4px;
+    background: #cbd5e1;
+    border-radius: 2px;
+    margin: 0 auto 16px;
+}
+
+.sheet-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.setting-group {
+    margin-bottom: 20px;
+}
+
+.setting-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #64748b;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.setting-label-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.theme-picker {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+
+.theme-btn {
+    padding: 12px 0;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 2px solid transparent;
+}
+
+.theme-btn-light { background: #ffffff; color: #1e293b; border-color: #e2e8f0; }
+.theme-btn-sepia { background: #fbf0d9; color: #3b2e21; }
+.theme-btn-dark  { background: #1e2022; color: #f3f4f6; }
+.theme-btn-black { background: #000000; color: #a3a3a3; }
+
+.theme-btn.selected {
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 2px rgba(43, 112, 224, 0.25);
+}
+
+.segmented-control {
+    display: flex;
+    background: #f1f5f9;
+    padding: 4px;
+    border-radius: 8px;
+    gap: 4px;
+}
+
+.seg-btn {
+    flex: 1;
+    padding: 8px 0;
+    font-size: 13px;
+    font-weight: 600;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    color: #64748b;
+    cursor: pointer;
+}
+
+.seg-btn.selected {
+    background: #ffffff;
+    color: #0f172a;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.slider-control {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.slider-control input[type="range"] {
+    flex: 1;
+    height: 6px;
+    background: #e2e8f0;
+    border-radius: 3px;
+    accent-color: var(--primary-color);
+}
+
+.step-btn {
+    background: #f1f5f9;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #475569;
+    cursor: pointer;
+}
+
+/* ==========================================================================
+   モーダル (ダウンロード進捗 & リーダー目次)
+   ========================================================================== */
+
+.app-modal {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 120;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.modal-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.modal-box {
+    position: relative;
+    background: #ffffff;
+    border-radius: var(--radius-lg);
+    width: 100%;
+    max-width: 400px;
+    padding: 24px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.modal-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 8px;
+}
+
+.modal-status-text {
+    font-size: 13px;
+    color: #64748b;
+    margin-bottom: 16px;
+    min-height: 20px;
+}
+
+.modal-progress-bar {
+    width: 100%;
+    height: 8px;
+    background: #e2e8f0;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.modal-progress-text {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--primary-color);
+    text-align: right;
+    margin-bottom: 18px;
+}
+
+/* リーダー内 目次モーダル */
+.modal-toc-box {
+    position: relative;
+    background: #ffffff;
+    border-radius: var(--radius-lg);
+    width: 100%;
+    max-width: 460px;
+    height: 80vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.modal-toc-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.btn-close-modal {
+    background: transparent;
+    border: none;
+    font-size: 18px;
+    color: #94a3b8;
+    padding: 4px;
+    cursor: pointer;
+}
+
+.modal-toc-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 0;
+}
+
+.toc-modal-item {
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    border-bottom: 1px solid #f8fafc;
+}
+
+.toc-modal-item:active {
+    background: #f1f5f9;
+}
+
+.toc-modal-item.selected {
+    background: #eff6ff;
+    color: var(--primary-color);
+    font-weight: 700;
+}
+
+.toc-ep {
+    font-size: 12px;
+    font-weight: 700;
+    color: #94a3b8;
+    min-width: 28px;
+}
+
+.toc-modal-item.selected .toc-ep {
+    color: var(--primary-color);
+}
+
+.toc-title {
+    flex: 1;
+    font-size: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.toc-now {
+    font-size: 10px;
+    background: var(--primary-color);
+    color: #ffffff;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+/* トースト通知 */
+.app-toast {
+    position: fixed;
+    bottom: calc(var(--safe-bottom) + 30px);
+    left: 50%;
+    transform: translateX(-50%) translateY(30px);
+    background: rgba(15, 23, 42, 0.92);
+    color: #ffffff;
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 600;
+    z-index: 200;
+    opacity: 0;
+    transition: transform 0.25s, opacity 0.25s;
+    pointer-events: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.app-toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+
+/* ローディング & エラー */
+.loading-spinner {
+    padding: 60px 20px;
+    text-align: center;
+    color: #64748b;
+}
+
+.spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid rgba(43, 112, 224, 0.15);
+    border-top-color: var(--primary-color);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 12px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.error-msg {
+    padding: 40px 20px;
+    text-align: center;
+    color: #ef4444;
+}
+
+.error-detail {
+    font-size: 12px;
+    color: #94a3b8;
+    margin: 8px 0 16px;
+}
+
+/* ==========================================================================
+   バックグラウンド ダウンロード フローティングバー
+   ========================================================================== */
+
+.floating-download-bar {
+    position: fixed;
+    top: calc(var(--safe-top) + 64px); /* ヘッダーHUDの真下に配置し被りを解消 */
+    left: 50%;
+    transform: translateX(-50%) translateY(-100px);
+    width: calc(100% - 32px);
+    max-width: 440px;
+    background: rgba(15, 23, 42, 0.94);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    color: #ffffff;
+    border-radius: 14px;
+    padding: 10px 14px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    z-index: 999;
+    transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.3s;
+    opacity: 0;
+    pointer-events: none;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.floating-download-bar.active {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.floating-download-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 6px;
+}
+
+.floating-download-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow: hidden;
+}
+
+.floating-download-icon {
+    font-size: 16px;
+    animation: bounce 1.5s infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+}
+
+.floating-download-title {
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 170px;
+}
+
+.floating-download-count {
+    font-size: 11px;
+    color: #93c5fd;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.floating-download-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-floating-action {
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.btn-floating-action:active {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.floating-download-track {
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.floating-download-fill {
+    height: 100%;
+    background: #3b82f6;
+    border-radius: 2px;
+    width: 0%;
+    transition: width 0.2s linear;
+}
+
+/* ==========================================================================
+   検索機能 & タブ切り替え & 作品削除スタイル
+   ========================================================================== */
+
+.add-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 8px;
+}
+
+.tab-btn {
+    background: transparent;
+    border: none;
+    font-size: 13px;
+    font-weight: 700;
+    color: #64748b;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.tab-btn.active {
+    background: #eff6ff;
+    color: var(--primary-color);
+}
+
+.search-results-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 14px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.search-result-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.search-result-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.4;
+}
+
+.search-result-meta {
+    font-size: 11px;
+    color: #64748b;
+    display: flex;
+    gap: 8px;
+}
+
+.search-result-story {
+    font-size: 12px;
+    color: #475569;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.btn-add-search-novel {
+    align-self: flex-end;
+    background: #e0f2fe;
+    color: #0369a1;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 6px 14px;
+    cursor: pointer;
+}
+
+.btn-add-search-novel:active {
+    background: #bae6fd;
+}
+
+/* 本棚内検索・絞り込み入力欄 */
+.library-filter-wrap {
+    margin-bottom: 14px;
+}
+
+.filter-input {
+    width: 100%;
+    padding: 9px 14px;
+    font-size: 13px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #ffffff;
+    outline: none;
+}
+
+.filter-input:focus {
+    border-color: var(--primary-color);
+}
+
+/* 作品詳細画面の削除ボタン */
+.btn-delete-from-detail {
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 10px;
+}
+
+.btn-delete-from-detail:active {
+    background: #fee2e2;
+}
+
+/* ==========================================================================
+   PWA インストール促進バナー
+   ========================================================================== */
+
+.pwa-install-banner {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: #ffffff;
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin: 12px 16px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+    animation: fadeIn 0.4s ease-out;
+}
+
+.pwa-banner-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.pwa-banner-icon {
+    font-size: 24px;
+}
+
+.pwa-banner-title {
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.pwa-banner-desc {
+    font-size: 11px;
+    opacity: 0.9;
+    margin-top: 2px;
+}
+
+.btn-pwa-install {
+    background: #ffffff;
+    color: #1d4ed8;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 8px 14px;
+    cursor: pointer;
+    white-space: nowrap;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.btn-pwa-install:active {
+    background: #f1f5f9;
+}
