@@ -80,8 +80,9 @@ export const SAMPLE_CHAPTERS = [
 
 export class NovelAPI {
     constructor() {
-        this.timeoutMs = 15000;
+        this.timeoutMs = 12000;
         this.defaultProxies = [
+            'https://novel.kzfm-game-aka.workers.dev/proxy?url=',
             'https://api.allorigins.win/raw?url=',
             'https://corsproxy.io/?url='
         ];
@@ -120,10 +121,42 @@ export class NovelAPI {
     }
 
     /**
+     * プロキシURLを自動判定して組み立て
+     * すべての外部リクエストが正しくカスタムプロキシ（?url=...）を経由するように統一
+     */
+    static buildProxyUrl(rawProxy, targetUrl) {
+        if (!rawProxy || !rawProxy.trim()) return targetUrl;
+        let proxy = rawProxy.trim();
+        if (!proxy.startsWith('http://') && !proxy.startsWith('https://')) {
+            proxy = 'https://' + proxy;
+        }
+
+        // Cloudflare Workers (novel.kzfm-game-aka.workers.dev) の自動正規化
+        if (proxy.includes('novel.kzfm-game-aka.workers.dev') && !proxy.includes('/proxy') && !proxy.includes('?url=')) {
+            proxy = proxy.replace(/\/+$/, '') + '/proxy?url=';
+        }
+
+        if (proxy.endsWith('=') || proxy.includes('?')) {
+            if (proxy.endsWith('=')) {
+                return proxy + encodeURIComponent(targetUrl);
+            } else if (proxy.endsWith('?')) {
+                return proxy + 'url=' + encodeURIComponent(targetUrl);
+            } else {
+                const sep = proxy.includes('?') ? '&' : '?';
+                return proxy + sep + 'url=' + encodeURIComponent(targetUrl);
+            }
+        }
+
+        // パス型プロキシ（https://example.workers.dev/https://target...）
+        const base = proxy.replace(/\/+$/, '');
+        return `${base}/${targetUrl}`;
+    }
+
+    /**
      * CORSプロキシまたは直接通信でテキストを取得
      */
     async fetchText(targetUrl, timeoutMs = this.timeoutMs) {
-        // 1. ユーザー設定のカスタムプロキシがあれば優先
+        // 1. ユーザー設定のカスタムプロキシがあれば最優先
         let customProxy = null;
         try {
             customProxy = await db.getSetting('custom_cors_proxy', null);
@@ -134,34 +167,43 @@ export class NovelAPI {
             proxies.push(customProxy.trim());
         }
 
-        // 2. 同一オリジンが自前APIサーバーの場合（ローカル実行時）
-        if (location.protocol.startsWith('http') && !location.hostname.includes('github.io')) {
-            // ローカルサーバー起動時
+        // 2. デフォルトプロキシ群を追加
+        for (const dp of this.defaultProxies) {
+            if (!proxies.includes(dp)) {
+                proxies.push(dp);
+            }
         }
-
-        proxies.push(...this.defaultProxies);
         proxies.push(''); // 直接アクセス（フォールバック）
 
         let lastError = null;
 
         for (const proxy of proxies) {
-            let fetchUrl = targetUrl;
-            if (proxy) {
-                if (proxy.endsWith('=')) {
-                    fetchUrl = proxy + encodeURIComponent(targetUrl);
-                } else {
-                    fetchUrl = proxy.replace(/\/$/, '') + '/?url=' + encodeURIComponent(targetUrl);
-                }
-            }
+            const fetchUrl = NovelAPI.buildProxyUrl(proxy, targetUrl);
 
             const controller = new AbortController();
             const timer = setTimeout(() => controller.abort(), timeoutMs);
 
             try {
-                const res = await fetch(fetchUrl, { signal: controller.signal });
+                const res = await fetch(fetchUrl, {
+                    method: 'GET',
+                    signal: controller.signal,
+                    credentials: 'omit', // 不要なCookie送信を防ぎ401エラーを抑止
+                    cache: 'no-cache',
+                    headers: {
+                        'Accept': 'text/html,application/xhtml+xml,application/xml,application/json,text/plain,*/*'
+                    }
+                });
                 clearTimeout(timer);
+
                 if (res.ok) {
-                    return await res.text();
+                    const text = await res.text();
+                    // プロキシが自サイトのLPやHTMLエラーを返してきた場合は無効として次を試行
+                    if (proxy && text.includes('<!DOCTYPE html>') && targetUrl.includes('api.syosetu.com')) {
+                        throw new Error('プロキシが不正な応答（HTML）を返しました');
+                    }
+                    return text;
+                } else {
+                    lastError = new Error(`HTTP Error ${res.status}: ${res.statusText}`);
                 }
             } catch (err) {
                 clearTimeout(timer);
@@ -239,7 +281,7 @@ export class NovelAPI {
     }
 
     // =========================================================================
-    // 公開APIメソッド群
+    // 公開APIメソッド群（すべてプロキシ経由で統一・不要な/api/直接呼出を排除）
     // =========================================================================
 
     /**
@@ -249,15 +291,6 @@ export class NovelAPI {
         if (!word || !word.trim()) return [];
         const encodedWord = encodeURIComponent(word.trim());
         const targetUrl = `https://api.syosetu.com/novelapi/api/?out=json&word=${encodedWord}&lim=15&of=t-w-s-k-ga-gp-gl-nt-n`;
-
-        // もしローカルAPIサーバーが動いているなら直接叩く
-        try {
-            const res = await fetch(`/api/search?word=${encodedWord}`);
-            if (res.ok) {
-                const data = await res.json();
-                return data.results || [];
-            }
-        } catch (e) {}
 
         const text = await this.fetchText(targetUrl);
         const data = JSON.parse(text);
@@ -282,12 +315,6 @@ export class NovelAPI {
         if (!key) throw new Error('有効なNコードまたはカクヨムURLが見つかりません');
 
         if (source === 'sample') return SAMPLE_NOVEL;
-
-        // ローカルAPIサーバーチェック
-        try {
-            const res = await fetch(`/api/info?ncode=${encodeURIComponent(key)}`);
-            if (res.ok) return await res.json();
-        } catch (e) {}
 
         if (source === 'kakuyomu') {
             const html = await this.fetchText(ky.workUrl(id));
@@ -332,12 +359,6 @@ export class NovelAPI {
             if (ch) return ch;
             throw new Error('指定されたサンプル話が見つかりません');
         }
-
-        // ローカルAPIサーバーチェック
-        try {
-            const res = await fetch(`/api/chapter?ncode=${encodeURIComponent(key)}&ep=${epNum}`);
-            if (res.ok) return await res.json();
-        } catch (e) {}
 
         if (source === 'kakuyomu') {
             // カクヨム: 目次からエピソードIDを取得して本文取得
@@ -402,12 +423,6 @@ export class NovelAPI {
                 episodes: SAMPLE_CHAPTERS.map(c => ({ ep: c.ep, title: c.subtitle }))
             };
         }
-
-        // ローカルAPIサーバーチェック
-        try {
-            const res = await fetch(`/api/toc?ncode=${encodeURIComponent(key)}`);
-            if (res.ok) return await res.json();
-        } catch (e) {}
 
         if (source === 'kakuyomu') {
             const html = await this.fetchText(ky.workUrl(id));
