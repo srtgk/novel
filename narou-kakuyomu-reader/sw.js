@@ -4,16 +4,16 @@
  * Cache-Fallback for 100% offline functionality.
  */
 
-const CACHE_NAME = 'narou-reader-v9';
+const CACHE_NAME = 'narou-reader-v11';
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
     './manifest.webmanifest',
-    './css/style.css?v=9',
-    './js/app.js?v=9',
+    './css/style.css?v=11',
+    './js/app.js?v=11',
     './js/reader.js',
     './js/db.js',
-    './js/api.js',
+    './js/api.js?v=11',
     './js/kakuyomu.js',
     './icons/icon.svg',
     './icons/icon-192.png',
